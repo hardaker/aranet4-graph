@@ -1,4 +1,4 @@
-# Graph data file(s) from an aranet4 sensor.
+# Graph data file(s) from an aranet4 sensor
 
 aranet4-graph takes a YAML file as input.
 
@@ -17,7 +17,14 @@ markers:
        "2022-11-04 17:45 MDT": "at next gate"
 end:   "2022-11-04 18:45 MDT"
 
-# Example output:
+# Installation
+
+    pipx install aranet4-graph
+
+or
+    pip install aranet4-graph
+
+# Example output
 
 ![Example output image](images/example.png)
 
