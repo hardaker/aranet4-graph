@@ -4,6 +4,7 @@ aranet4-graph takes a YAML file as input.
 
 Example:
 
+``` yaml
 file: 2022-11-05-smf-to-lhr.csv
 begin: "2022-11-04 08:23 PDT"
 markers:
@@ -16,6 +17,7 @@ markers:
        "2022-11-04 16:45 MDT": "DEN United club"
        "2022-11-04 17:45 MDT": "at next gate"
 end:   "2022-11-04 18:45 MDT"
+```
 
 # Installation
 
