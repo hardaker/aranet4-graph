@@ -87,7 +87,7 @@ def main():
 #        size=20,
         data=data,
         hue="Carbon dioxide(ppm)",
-        hue_norm=(400,2500),
+        hue_norm=(400,1400),
         palette="coolwarm",
         x="Time(dd/mm/yyyy)",
         y="Carbon dioxide(ppm)", 
