@@ -1,6 +1,7 @@
 import seaborn as sns
 sns.set()
 import pandas
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy
 from dateparser import parse
@@ -50,7 +51,10 @@ def main():
     
     content = yaml.load(args.input_file, Loader=yaml.FullLoader)
 
-    debug("here")
+    matplotlib.use('Agg')  # avoids needing an X terminal
+    font = {'size': 16}
+    matplotlib.rc('font', **font)
+
     # Apply the default theme
     # sns.set_theme()
     # sns.color_palette("flare", as_cmap=True)
@@ -63,21 +67,12 @@ def main():
                            dayfirst=True)
 
     if "begin" in content:
-        data = data[data["Time(dd/mm/yyyy)"] > content["begin"]]
+        timestamp = numpy.datetime64(parse(content["begin"]), 's')
+        data = data[data["Time(dd/mm/yyyy)"] > timestamp]
 
     if "end" in content:
-        data = data[data["Time(dd/mm/yyyy)"] < content["ent"]]
-
-    
-
-    annotations_d = {
-    #    numpy.datetime64(int(x.timestamp()), 's'): "waiting",
-        "2022-11-04 12:30 MDT": "waiting",
-        "2022-11-04 13:23 MDT": "boarding",
-        "2022-11-04 14:10 MDT": "taking off",
-        "2022-11-04 16:00 MDT": "landing",
-    #    "02/11/2022 13:03:04": "boarding",
-    }
+        timestamp = numpy.datetime64(parse(content["end"]), 's')
+        data = data[data["Time(dd/mm/yyyy)"] < timestamp]
 
     annotations_d = content["markers"]
     annotations = {}
@@ -89,7 +84,7 @@ def main():
 
     # Create a visualization
     x = sns.scatterplot(
-        size=2,
+#        size=20,
         data=data,
         hue="Carbon dioxide(ppm)",
         hue_norm=(400,2500),
@@ -102,11 +97,16 @@ def main():
         index = data[data["Time(dd/mm/yyyy)"] > annotation]["Time(dd/mm/yyyy)"][:1]
         value = data[data["Time(dd/mm/yyyy)"] > annotation]["Carbon dioxide(ppm)"][:1]
 
-        plt.annotate(annotations[annotation], xy=(index, value), xytext=(index, value+400),
+        plt.annotate(annotations[annotation],
+                     xy=(index, value),
+                     xytext=(index, value+400),
                      arrowprops={'width': 5})
 
+    plt.xlabel("")  # don't use the column title -- label is obvious
     fig = x.get_figure()
     fig.autofmt_xdate()
+    fig.set_dpi(100)
+    fig.set_size_inches(16, 9)
     fig.savefig("out.png")
 
 
