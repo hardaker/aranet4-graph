@@ -2,6 +2,8 @@ import seaborn
 seaborn.set()
 import pandas
 import matplotlib.pyplot as plt
+import numpy
+from dateparser import parse
 
 # Import seaborn
 import seaborn as sns
@@ -13,11 +15,23 @@ import seaborn as sns
 # sns.color_palette("coolwarm", as_cmap=True)
 
 # Load an example dataset
-data = pandas.read_csv("data1.csv", parse_dates=["Time(dd/mm/yyyy)"], dayfirst=True)
+data = pandas.read_csv("data2.csv", parse_dates=["Time(dd/mm/yyyy)"], dayfirst=True)
 
-annotations = {
-    "02/11/2022 13:03:04": "boarding",
+data = data[data["Time(dd/mm/yyyy)"] > "2022-11-04 08:23"]
+
+annotations_d = {
+#    numpy.datetime64(int(x.timestamp()), 's'): "waiting",
+    "2022-11-04 12:30 MDT": "waiting",
+    "2022-11-04 13:23 MDT": "boarding",
+    "2022-11-04 14:10 MDT": "taking off",
+    "2022-11-04 16:00 MDT": "landing",
+#    "02/11/2022 13:03:04": "boarding",
 }
+
+annotations = {}
+for timestamp in annotations_d:
+    time = parse(timestamp)
+    annotations[numpy.datetime64(int(time.timestamp()), 's')] = annotations_d[timestamp]
 
 #import pdb ; pdb.set_trace()
 
@@ -32,22 +46,13 @@ x = sns.scatterplot(
     y="Carbon dioxide(ppm)", 
 )
 
-index = data[data["Time(dd/mm/yyyy)"] == "2022-11-04 16:37:59"]["Time(dd/mm/yyyy)"]
-value = data[data["Time(dd/mm/yyyy)"] == "2022-11-04 16:37:59"]["Carbon dioxide(ppm)"]
+for annotation in annotations:
+    index = data[data["Time(dd/mm/yyyy)"] > annotation]["Time(dd/mm/yyyy)"][:1]
+    value = data[data["Time(dd/mm/yyyy)"] > annotation]["Carbon dioxide(ppm)"][:1]
 
-import pdb ; pdb.set_trace()
-
-plt.annotate("boarding", (index, value))
-
-data.set_index("Time(dd/mm/yyyy)", inplace=True)
-spot = data.loc["2022-11-04 16:37:59"]
-
-plt.annotate("boarding", (1644613384, 2400))
-plt.annotate("boarding", (1667566984, 2400))
-x.text(1667566984, 1200, "test")
-
-#data[]
-
+    plt.annotate(annotations[annotation], xy=(index, value), xytext=(index, value+400),
+                 arrowprops={'width': 5})
 
 fig = x.get_figure()
+fig.autofmt_xdate()
 fig.savefig("out.png")
