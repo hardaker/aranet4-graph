@@ -1,6 +1,11 @@
 # Graph data file(s) from an aranet4 sensor
 
-aranet4-graph takes a YAML file as input.
+The `aranet4-graph` (python) program takes a YAML input file for
+configuration that allows loading and graphing of a CSV file that has
+been exported from the aranet4 phone app.  The YAML configuration
+supports specifying the `file` to load, `begin` and `end` timestamps
+to limit the graph to and a set of `markers` for having arrows that
+point at the graph.
 
 Example:
 
