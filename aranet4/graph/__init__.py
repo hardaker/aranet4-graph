@@ -50,6 +50,7 @@ def parse_args():
     parser.add_argument(
         "output_file",
         type=str,
+        nargs="?",
         default="aranet4.png",
         help="Where to save the output png",
     )
@@ -82,11 +83,11 @@ def main():
     )
 
     if "begin" in content:
-        timestamp = numpy.datetime64(parse(content["begin"]), "s")
+        timestamp = numpy.datetime64(int(parse(content["begin"]).timestamp()), "s")
         data = data[data["Time(dd/mm/yyyy)"] > timestamp]
 
     if "end" in content:
-        timestamp = numpy.datetime64(parse(content["end"]), "s")
+        timestamp = numpy.datetime64(int(parse(content["end"]).timestamp()), "s")
         data = data[data["Time(dd/mm/yyyy)"] < timestamp]
 
     annotations_d = content["markers"]
@@ -124,9 +125,11 @@ def main():
     plt.xlabel("")  # don't use the column title -- label is obvious
     fig = x.get_figure()
     fig.autofmt_xdate()
+    plt.tight_layout()
     fig.set_dpi(100)
     fig.set_size_inches(16, 9)
-    fig.savefig("out.png")
+    fig.savefig(args.output_file)
+    info(f"saved: {args.output_file}")
 
 
 if __name__ == "__main__":
