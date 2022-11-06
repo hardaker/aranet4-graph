@@ -1,4 +1,5 @@
 import seaborn as sns
+
 sns.set()
 import pandas
 import matplotlib
@@ -22,38 +23,52 @@ from logging import debug, info, warning, error, critical
 import logging
 import sys
 
+
 def parse_args():
     "Parse the command line arguments."
-    parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter,
-                            description=__doc__,
-                            epilog="Exmaple Usage: aranet4-graph makeit.yml")
+    parser = ArgumentParser(
+        formatter_class=ArgumentDefaultsHelpFormatter,
+        description=__doc__,
+        epilog="Exmaple Usage: aranet4-graph makeit.yml",
+    )
 
-    parser.add_argument("--log-level", "--ll", default="info",
-                        help="Define the logging verbosity level (debug, info, warning, error, fotal, critical).")
+    parser.add_argument(
+        "--log-level",
+        "--ll",
+        default="info",
+        help="Define the logging verbosity level (debug, info, warning, error, fotal, critical).",
+    )
 
-    parser.add_argument("input_file", type=FileType('r'),
-                        nargs='?', default=sys.stdin,
-                        help="The yaml based config file")
+    parser.add_argument(
+        "input_file",
+        type=FileType("r"),
+        nargs="?",
+        default=sys.stdin,
+        help="The yaml based config file",
+    )
 
-    parser.add_argument("output_file", type=str, default="aranet4.png",
-                        help="Where to save the output png")
+    parser.add_argument(
+        "output_file",
+        type=str,
+        default="aranet4.png",
+        help="Where to save the output png",
+    )
 
     args = parser.parse_args()
     log_level = args.log_level.upper()
-    logging.basicConfig(level=log_level,
-                        format="%(levelname)-10s:\t%(message)s")
+    logging.basicConfig(level=log_level, format="%(levelname)-10s:\t%(message)s")
     return args
 
 
 def main():
     args = parse_args()
     debug(f"here: {args.input_file}")
-    
+
     content = yaml.load(args.input_file, Loader=yaml.FullLoader)
 
-    matplotlib.use('Agg')  # avoids needing an X terminal
-    font = {'size': 16}
-    matplotlib.rc('font', **font)
+    matplotlib.use("Agg")  # avoids needing an X terminal
+    font = {"size": 16}
+    matplotlib.rc("font", **font)
 
     # Apply the default theme
     # sns.set_theme()
@@ -62,45 +77,49 @@ def main():
     # sns.color_palette("coolwarm", as_cmap=True)
 
     # Load an example dataset
-    data = pandas.read_csv(content["file"],
-                           parse_dates=["Time(dd/mm/yyyy)"],
-                           dayfirst=True)
+    data = pandas.read_csv(
+        content["file"], parse_dates=["Time(dd/mm/yyyy)"], dayfirst=True
+    )
 
     if "begin" in content:
-        timestamp = numpy.datetime64(parse(content["begin"]), 's')
+        timestamp = numpy.datetime64(parse(content["begin"]), "s")
         data = data[data["Time(dd/mm/yyyy)"] > timestamp]
 
     if "end" in content:
-        timestamp = numpy.datetime64(parse(content["end"]), 's')
+        timestamp = numpy.datetime64(parse(content["end"]), "s")
         data = data[data["Time(dd/mm/yyyy)"] < timestamp]
 
     annotations_d = content["markers"]
     annotations = {}
     for timestamp in annotations_d:
         time = parse(timestamp)
-        annotations[numpy.datetime64(int(time.timestamp()), 's')] = annotations_d[timestamp]
+        annotations[numpy.datetime64(int(time.timestamp()), "s")] = annotations_d[
+            timestamp
+        ]
 
-    #import pdb ; pdb.set_trace()
+    # import pdb ; pdb.set_trace()
 
     # Create a visualization
     x = sns.scatterplot(
-#        size=20,
+        #        size=20,
         data=data,
         hue="Carbon dioxide(ppm)",
-        hue_norm=(400,1400),
+        hue_norm=(400, 1400),
         palette="coolwarm",
         x="Time(dd/mm/yyyy)",
-        y="Carbon dioxide(ppm)", 
+        y="Carbon dioxide(ppm)",
     )
 
     for annotation in annotations:
         index = data[data["Time(dd/mm/yyyy)"] > annotation]["Time(dd/mm/yyyy)"][:1]
         value = data[data["Time(dd/mm/yyyy)"] > annotation]["Carbon dioxide(ppm)"][:1]
 
-        plt.annotate(annotations[annotation],
-                     xy=(index, value),
-                     xytext=(index, value+400),
-                     arrowprops={'width': 5})
+        plt.annotate(
+            annotations[annotation],
+            xy=(index, value),
+            xytext=(index, value + 400),
+            arrowprops={"width": 5},
+        )
 
     plt.xlabel("")  # don't use the column title -- label is obvious
     fig = x.get_figure()
