@@ -90,13 +90,14 @@ def main():
         timestamp = numpy.datetime64(int(parse(content["end"]).timestamp()), "s")
         data = data[data["Time(dd/mm/yyyy)"] < timestamp]
 
-    annotations_d = content["markers"]
     annotations = {}
-    for timestamp in annotations_d:
-        time = parse(timestamp)
-        annotations[numpy.datetime64(int(time.timestamp()), "s")] = annotations_d[
-            timestamp
-        ]
+    if "markers" in content:
+        annotations_d = content["markers"]
+        for timestamp in annotations_d:
+            time = parse(timestamp)
+            annotations[numpy.datetime64(int(time.timestamp()), "s")] = annotations_d[
+                timestamp
+            ]
 
     # import pdb ; pdb.set_trace()
 
@@ -125,7 +126,7 @@ def main():
     plt.xlabel("")  # don't use the column title -- label is obvious
     fig = x.get_figure()
     fig.autofmt_xdate()
-    plt.tight_layout()
+    #    plt.tight_layout()
     fig.set_dpi(100)
     fig.set_size_inches(16, 9)
     fig.savefig(args.output_file)
