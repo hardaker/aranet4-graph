@@ -51,7 +51,6 @@ def parse_args():
         "output_file",
         type=str,
         nargs="?",
-        default="aranet4.png",
         help="Where to save the output png",
     )
 
@@ -67,6 +66,18 @@ def main():
 
     content = yaml.load(args.input_file, Loader=yaml.FullLoader)
 
+    # find where to save the output PNG to
+    output_file = args.output_file
+    if not output_file:
+        output_file = content.get("output")
+
+    if not output_file:
+        error(
+            f"neither 'output_file' was given or an 'output' key in '{args.input_file.name}' was supplied"
+        )
+        exit(1)
+
+    # bootstrap matplotlib lib fonts/size
     matplotlib.use("Agg")  # avoids needing an X terminal
     font = {"size": 16}
     matplotlib.rc("font", **font)
@@ -79,7 +90,7 @@ def main():
 
     # Load an example dataset
     data = pandas.read_csv(
-        content["file"], parse_dates=["Time(dd/mm/yyyy)"], dayfirst=True
+        content["input"], parse_dates=["Time(dd/mm/yyyy)"], dayfirst=True
     )
 
     if "begin" in content:
@@ -89,17 +100,6 @@ def main():
     if "end" in content:
         timestamp = numpy.datetime64(int(parse(content["end"]).timestamp()), "s")
         data = data[data["Time(dd/mm/yyyy)"] < timestamp]
-
-    annotations = {}
-    if "markers" in content:
-        annotations_d = content["markers"]
-        for timestamp in annotations_d:
-            time = parse(timestamp)
-            annotations[numpy.datetime64(int(time.timestamp()), "s")] = annotations_d[
-                timestamp
-            ]
-
-    # import pdb ; pdb.set_trace()
 
     # Create a visualization
     x = sns.scatterplot(
@@ -112,14 +112,41 @@ def main():
         y="Carbon dioxide(ppm)",
     )
 
+    # if markers are specified, create all the needed data for it
+    annotations = {}
+    if "markers" in content:
+        annotations_d = content["markers"]
+        for timestamp in annotations_d:
+
+            # turn their date string into a raw epoch int
+            time = parse(timestamp)
+            time_d64 = numpy.datetime64(int(time.timestamp()), "s")
+
+            # extract the value
+            value = annotations_d[timestamp]
+
+            # turn a raw string into a dict
+            if isinstance(value, str):
+                value = {"label": value}
+
+            annotations[time_d64] = value
+
     for annotation in annotations:
+        # pull the next recorded timestamp *after* the annotation stamp
         index = data[data["Time(dd/mm/yyyy)"] > annotation]["Time(dd/mm/yyyy)"][:1]
+        # and the value
         value = data[data["Time(dd/mm/yyyy)"] > annotation]["Carbon dioxide(ppm)"][:1]
 
+        # default vertical offset of 400
+        vertical_offset = annotations[annotation].get("offset", 400)
+
+        # info(index)
+        # info(type(index))
+        # import pdb ; pdb.set_trace()
         plt.annotate(
-            annotations[annotation],
+            annotations[annotation]["label"],
             xy=(index, value),
-            xytext=(index, value + 400),
+            xytext=(index, value + vertical_offset),
             arrowprops={"width": 5},
         )
 
@@ -129,8 +156,9 @@ def main():
     #    plt.tight_layout()
     fig.set_dpi(100)
     fig.set_size_inches(16, 9)
-    fig.savefig(args.output_file)
-    info(f"saved: {args.output_file}")
+
+    fig.savefig(output_file)
+    info(f"saved: {output_file}")
 
 
 if __name__ == "__main__":
