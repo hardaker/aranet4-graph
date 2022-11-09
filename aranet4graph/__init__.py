@@ -138,15 +138,17 @@ def main():
         value = data[data["Time(dd/mm/yyyy)"] > annotation]["Carbon dioxide(ppm)"][:1]
 
         # default vertical offset of 400
-        vertical_offset = annotations[annotation].get("offset", 400)
+        vertical_offset = annotations[annotation].get("y_offset", 400)
+        horizontal_offset = annotations[annotation].get("x_offset", 0)
 
         # info(index)
         # info(type(index))
         # import pdb ; pdb.set_trace()
+        xpos = numpy.datetime64(int(index.iat[0].timestamp()), "s")
         plt.annotate(
             annotations[annotation]["label"],
             xy=(index, value),
-            xytext=(index, value + vertical_offset),
+            xytext=(xpos + horizontal_offset, value + vertical_offset),
             arrowprops={"width": 5},
         )
 
