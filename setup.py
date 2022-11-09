@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="aranet4-graph",
-    version="0.2",
+    version="0.3",
     author="Wes Hardaker",
     author_email="opensource@hardakers.net",
     description="Graph data file(s) from an aranet4 sensor.",
