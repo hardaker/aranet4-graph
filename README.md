@@ -6,8 +6,9 @@ been exported from the aranet4 phone app.  The YAML configuration
 supports specifying the `file` to load, `begin` and `end` timestamps
 to limit the graph to and a set of `markers` for having arrows that
 point at the graph.  Each marker can be a simple string, or may be a
-dictionary and a `label` and a `offset` that sets the vertical offset
-of the label and arrow length.  The default offset is 400.
+dictionary and a `label` and a `y_offset` that sets the vertical
+offset (default 400) of the label and arrow length and a `x_offset`
+(in seconds) for the horizontal offset (default 0).
 
 Example:
 
@@ -20,10 +21,11 @@ markers:
        "2022-11-04 11:30 PDT": "SMF gate"
        "2022-11-04 12:20 PDT":
          label: "boarding"
-         offset: 600
+         y_offset: 600
        "2022-11-04 13:05 PDT":
          label: "taking off"
-         offset: -200
+         y_offset: -200
+         h_offset: -1800
        "2022-11-04 13:55 PDT": "in flight"
        "2022-11-04 16:14 MDT": "landing"
        "2022-11-04 16:45 MDT": "DEN United club"
