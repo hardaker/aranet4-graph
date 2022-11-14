@@ -53,6 +53,3 @@ news article about measuring CO2 levels during IETF-115].
 
 https://github.com/hardaker/aranet4-graph
 
-# Sources of (randomish) information
-
-- [United airlines filtering:](https://www.youtube.com/4ZvIoVfqbw0)
