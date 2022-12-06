@@ -93,6 +93,11 @@ def main():
         content["input"], parse_dates=["Time(dd/mm/yyyy)"], dayfirst=True
     )
 
+    if "hours_offset" in content:
+        data["Time(dd/mm/yyyy)"] = data["Time(dd/mm/yyyy)"] - pandas.Timedelta(
+            hours=content["hours_offset"]
+        )
+
     if "begin" in content:
         timestamp = numpy.datetime64(int(parse(content["begin"]).timestamp()), "s")
         data = data[data["Time(dd/mm/yyyy)"] > timestamp]

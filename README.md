@@ -33,6 +33,18 @@ markers:
 end:   "2022-11-04 18:45 MDT"
 ```
 
+Note that when reading the data in, the timestamps are expected to be
+in UTC and your phone's aranet4 export feature will put them in your
+local timezone date/time instead.  Thus you can add an adjustment
+based on **when/where you extracted the data from your phone**.  For
+example, if I download the data in California during PDT, I'm negative
+8 hours off from UTC for this source CSV data file.  So in my *yaml*
+file I can account for this:
+
+``` yaml
+hours_offset: -8
+```
+
 # Installation
 
     pipx install aranet4-graph
