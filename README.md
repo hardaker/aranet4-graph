@@ -56,8 +56,7 @@ or
 
 For a more complete read about analyzing a week-long trip using an
 aranet4 and this software, refer to my
-[https://www.isi.edu/~hardaker/news/20221106-ietf-c02-analysis/][personal
-news article about measuring CO2 levels during IETF-115].
+[personal news article about measuring CO2 levels during IETF-115](https://www.isi.edu/~hardaker/news/20221106-ietf-c02-analysis/).
 
 ![Example output image](images/example.png)
 
